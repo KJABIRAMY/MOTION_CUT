@@ -1,1 +1,11 @@
+def count(para):
+    s = para.split()
+    return len(s)
 
+def main():
+    text = input("Enter a sentence or paragraph: ")
+    word_count = count(text)
+    print(f"The text contains {word_count} words.")
+
+if __name__ == "__main__":
+    main()
