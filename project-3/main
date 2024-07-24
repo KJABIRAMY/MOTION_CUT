@@ -1,0 +1,96 @@
+import csv
+import os
+categories = {}
+expenses = []
+def main():
+    load_categories()
+    load_expenses()
+
+    while True:
+        print("Expense Tracker Menu:")
+        print("1. Add Expense")
+        print("2. View Expenses")
+        print("3. Analyze Expenses")
+        print("4. Quit")
+
+        choice = input("Choose an option: ")
+
+        if choice == "1":
+            add_expense()
+        elif choice == "2":
+            view_expenses()
+        elif choice == "3":
+            analyze_expenses()
+        elif choice == "4":
+            break
+        else:
+            print("Invalid choice. Please choose again.")
+
+def load_categories():
+    if not os.path.exists('categories.csv'):
+        with open('categories.csv', 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=['category', 'description'])
+            writer.writeheader()
+    else:
+        with open('categories.csv', 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                categories[row['category']] = row['description']
+
+def load_expenses():
+    if not os.path.exists('expenses.csv'):
+        with open('expenses.csv', 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=['date', 'category', 'amount', 'description'])
+            writer.writeheader()
+    else:
+        with open('expenses.csv', 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                expenses.append({
+                    'date': row['date'],
+                    'category': row['category'],
+                    'amount': float(row['amount']),
+                    'description': row['description']
+                })
+
+def add_expense():
+    date = input("Enter date (YYYY-MM-DD): ")
+    category = input("Enter category: ")
+    amount = float(input("Enter amount: "))
+    description = input("Enter description: ")
+
+    expenses.append({
+        'date': date,
+        'category': category,
+        'amount': amount,
+        'description': description
+    })
+
+    with open('expenses.csv', 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=['date', 'category', 'amount', 'description'])
+        writer.writeheader()
+        for expense in expenses:
+            writer.writerow(expense)
+
+def view_expenses():
+
+    for expense in expenses:
+        print(f"Date: {expense['date']}, Category: {expense['category']}, Amount: {expense['amount']}, Description: {expense['description']}")
+
+def analyze_expenses():
+    total_spent = sum(expense['amount'] for expense in expenses)
+
+    category_sums = {}
+    for expense in expenses:
+        if expense['category'] not in category_sums:
+            category_sums[expense['category']] = 0
+        category_sums[expense['category']] += expense['amount']
+    average_spent_per_category = {category: total / len(expenses) for category, total in category_sums.items()}
+
+    print(f"Total Spent: {total_spent}")
+    print("Average Spent per Category:")
+    for category, average in average_spent_per_category.items():
+        print(f"{category}: {average}")
+
+if __name__ == "__main__":
+    main()
